@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+dist/
+build/
+*.pt
+*.safetensors
+*.bin
+.mrp-tracker/
+uv.lock
