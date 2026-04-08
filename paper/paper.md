@@ -369,7 +369,7 @@ We also examined 264M-scale protection pilots using mean-margin protection and E
 | Mean-protect + EWC λ=1 | 0.4003 | 2.42x | 331 | 137 |
 | Mean-protect + EWC λ=10000 | 0.4013 | 2.43x | 336 | 138 |
 
-These pilots suggest that shorter mean-protect passes may be somewhat safer than longer ones, but they do not show a clear EWC benefit. The targeted variants above also use mean-margin protection; no logsumexp-protect variant was evaluated, so that approach should be treated as a proposed direction rather than a tested result.
+These pilots suggest that shorter mean-protect passes may be somewhat safer than longer ones, but they do not show a clear EWC benefit.
 
 # Discussion and Future Exploration
 
