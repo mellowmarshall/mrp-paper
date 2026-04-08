@@ -230,16 +230,20 @@ standard cross-entropy is a top-2 sort of the logit vector at each
 position. This makes it a natural baseline against which to compare more
 expensive geometric objectives.
 
-\textbf{Algorithm 1: Margin Maximization Loss}
-
-\begin{verbatim}
-Input: logits L $\in$ R^{B$\times$S$\times$V}, threshold $\tau$
-top2 $\leftarrow$ TopK(L, k=2)                          // [B, S, 2]
-m $\leftarrow$ top2[:,:,0] - top2[:,:,1]                 // Voronoi margin
-gate $\leftarrow$ {(b,s) : m[b,s] < $\tau$}                   // low-margin positions only
-L_margin $\leftarrow$ -mean(m[gate])
-return L_margin
-\end{verbatim}
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.9\textwidth}{
+\textbf{Algorithm 1: Margin Maximization Loss}\\[4pt]
+\begin{tabular}{@{}l@{\quad}l@{}}
+\textbf{Input:} logits $L \in \mathbb{R}^{B \times S \times V}$, threshold $\tau$ & \\
+$\mathrm{top2} \leftarrow \mathrm{TopK}(L, k{=}2)$ & // $[B, S, 2]$ \\
+$m \leftarrow \mathrm{top2}[:,:,0] - \mathrm{top2}[:,:,1]$ & // Voronoi margin \\
+$\mathrm{gate} \leftarrow \{(b,s) : m[b,s] < \tau\}$ & // low-margin positions only \\
+$L_{\mathrm{margin}} \leftarrow -\mathrm{mean}(m[\mathrm{gate}])$ & \\
+\textbf{return} $L_{\mathrm{margin}}$ & \\
+\end{tabular}
+}}
+\end{figure}
 
 \hypertarget{fisher-information-distance}{%
 \subsection{Fisher Information
@@ -289,23 +293,27 @@ quadratic form at each position. In practice with k=5, this adds roughly
 3--5x overhead per step compared to margin maximization, though both are
 dominated by the forward pass through the base model.
 
-\textbf{Algorithm 2: Fisher Information Distance Loss}
-
-\begin{verbatim}
-Input: logits L $\in$ R^{B$\times$S$\times$V}, unembedding W $\in$ R^{V$\times$d}, k
-top_k_logits, top_k_idx $\leftarrow$ TopK(L, k)          // [B, S, k]
-p_k $\leftarrow$ Softmax(top_k_logits)                    // renormalized top-k probs
-W_k $\leftarrow$ Normalize(W[top_k_idx])                  // L2-normalize embeddings [B, S, k, d]
-$\Sigma$_k $\leftarrow$ diag(p_k) - p_k p_k^T                   // [B, S, k, k]
-for each pair (i, j) where i $\neq$ j:
-    $\delta$ $\leftarrow$ W_k[:,:,i,:] - W_k[:,:,j,:]           // embedding difference [B, S, d]
-    proj $\leftarrow$ $\delta$ $\cdot$ W_k^T                           // project onto top-k subspace [B, S, k]
-    d$^2$_F[i,j] $\leftarrow$ proj^T $\cdot$ $\Sigma$_k $\cdot$ proj           // Fisher distance squared
-d_F $\leftarrow$ sqrt(d$^2$_F)
-penalty $\leftarrow$ $\Sigma$_{i$\neq$j} p_k[i] $\cdot$ p_k[j] $\cdot$ d_F[i,j] // probability-weighted sum
-L_Fisher $\leftarrow$ -mean(penalty)
-return L_Fisher
-\end{verbatim}
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.9\textwidth}{
+\textbf{Algorithm 2: Fisher Information Distance Loss}\\[4pt]
+\begin{tabular}{@{}l@{\quad}l@{}}
+\textbf{Input:} logits $L \in \mathbb{R}^{B \times S \times V}$, unembedding $W \in \mathbb{R}^{V \times d}$, $k$ & \\
+$\mathrm{top\_k\_logits},\; \mathrm{top\_k\_idx} \leftarrow \mathrm{TopK}(L, k)$ & // $[B, S, k]$ \\
+$p_k \leftarrow \mathrm{Softmax}(\mathrm{top\_k\_logits})$ & // renormalized top-$k$ probs \\
+$W_k \leftarrow \mathrm{Normalize}(W[\mathrm{top\_k\_idx}])$ & // L2-normalize embeddings \\
+$\Sigma_k \leftarrow \mathrm{diag}(p_k) - p_k p_k^T$ & // $[B, S, k, k]$ \\
+\textbf{for each} pair $(i, j)$ where $i \neq j$: & \\
+\quad $\delta \leftarrow W_k[:,:,i,:] - W_k[:,:,j,:]$ & // embedding difference \\
+\quad $\mathrm{proj} \leftarrow \delta \cdot W_k^T$ & // project onto top-$k$ subspace \\
+\quad $d^2_F[i,j] \leftarrow \mathrm{proj}^T \cdot \Sigma_k \cdot \mathrm{proj}$ & // Fisher distance squared \\
+$d_F \leftarrow \sqrt{d^2_F}$ & \\
+$\mathrm{penalty} \leftarrow \sum_{i \neq j} p_k[i] \cdot p_k[j] \cdot d_F[i,j]$ & // probability-weighted sum \\
+$L_{\mathrm{Fisher}} \leftarrow -\mathrm{mean}(\mathrm{penalty})$ & \\
+\textbf{return} $L_{\mathrm{Fisher}}$ & \\
+\end{tabular}
+}}
+\end{figure}
 
 \hypertarget{experimental-setup}{%
 \section{Experimental Setup}\label{experimental-setup}}
