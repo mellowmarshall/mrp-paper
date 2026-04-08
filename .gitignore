@@ -9,3 +9,10 @@ build/
 *.bin
 .mrp-tracker/
 uv.lock
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
